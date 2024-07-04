@@ -2,12 +2,14 @@ let deckId
 const cardsContainer = document.getElementById("cards")
 const newDeckBtn = document.getElementById("new-deck")
 const drawCardBtn = document.getElementById("draw-cards")
+const winnerHeading = document.getElementById("winner-text")
 
 function handleClick() {
     fetch("https://apis.scrimba.com/deckofcards/api/deck/new/shuffle/")
         .then(res => res.json())
         .then(data => {
             deckId = data.deck_id
+            console.log(deckId)
         })
 }
 
@@ -23,31 +25,33 @@ drawCardBtn.addEventListener("click", () => {
             cardsContainer.children[1].innerHTML = `
                 <img src=${data.cards[1].image} class="card" />
             `
+            const winnerText = determineCardWinner(data.cards[0], data.cards[1])
+            winnerHeading.textContent = `${winnerText}`
         })
 })
+
 
 function determineCardWinner(card1, card2) {
     const valueOptions = ["2", "3", "4", "5", "6", "7", "8", "9", 
     "10", "JACK", "QUEEN", "KING", "ACE"]
     const card1ValueIndex = valueOptions.indexOf(card1.value)
     const card2ValueIndex = valueOptions.indexOf(card2.value)
-    console.log("card 1:", card1ValueIndex)
-    console.log("card 2:", card2ValueIndex)
     
     if (card1ValueIndex > card2ValueIndex) {
-        console.log("Card 1 wins!")
+        return "Card 1 wins!"
     } else if (card1ValueIndex < card2ValueIndex) {
-        console.log("Card 2 wins!")
+        return "Card 2 wins!"
     } else {
-        console.log("It's a tie!")
+        return "War!"
     }
 }
 
-const card1Obj = {
-    value: "JACK"
-}
-const card2Obj = {
-    value: "QUEEN"
-}
+// Keeping this test case for reference, but should delete later
+// const card1Obj = {
+//     value: "JACK"
+// }
+// const card2Obj = {
+//     value: "QUEEN"
+// }
 
-determineCardWinner(card1Obj, card2Obj)
+// determineCardWinner(card1Obj, card2Obj)
