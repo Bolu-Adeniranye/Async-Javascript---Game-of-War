@@ -5,19 +5,25 @@ const cardsContainer = document.getElementById("cards");
 const newDeckBtn = document.getElementById("new-deck");
 const drawCardBtn = document.getElementById("draw-cards");
 const winnerHeading = document.getElementById("winner-text");
-const topContainer = document.getElementById("top-div");
+const remainingCardsEl = document.getElementById("remaining-cards"); // Updated to use the new element
 const computerScoreEl = document.getElementById("computer-score");
 const myScoreEl = document.getElementById("my-score");
 
 function handleClick() {
-    fetch("https://apis.scrimba.com/deckofcards/api/deck/new/shuffle/")
-        .then(res => res.json())
+    console.log("New deck button clicked");
+    fetch("https://www.deckofcardsapi.com/api/deck/new/shuffle/")
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
         .then(data => {
             deckId = data.deck_id;
-            console.log(deckId);
+            console.log("Deck ID:", deckId);
 
             // Reset the UI and scores
-            topContainer.children[1].innerHTML = `<p>Remaining Cards: ${data.remaining}</p>`;
+            remainingCardsEl.innerHTML = `Remaining Cards: ${data.remaining}`;
             cardsContainer.children[0].innerHTML = ``;
             cardsContainer.children[1].innerHTML = ``;
             computerScore = 0;
@@ -33,10 +39,22 @@ function handleClick() {
 newDeckBtn.addEventListener("click", handleClick);
 
 drawCardBtn.addEventListener("click", () => {
-    fetch(`https://apis.scrimba.com/deckofcards/api/deck/${deckId}/draw/?count=2`)
-        .then(res => res.json())
+    if (!deckId) {
+        console.error('No deck ID available. Please shuffle a new deck.');
+        return;
+    }
+
+    fetch(`https://www.deckofcardsapi.com/api/deck/${deckId}/draw/?count=2`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+        })
         .then(data => {
-            topContainer.children[1].innerHTML = `<p>Remaining Cards: ${data.remaining}</p>`;
+            console.log("Drawn cards:", data.cards);
+
+            remainingCardsEl.innerHTML = `Remaining Cards: ${data.remaining}`;
             cardsContainer.children[0].innerHTML = `
                 <img src=${data.cards[0].image} class="card" />
             `;
